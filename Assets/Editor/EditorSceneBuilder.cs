@@ -10,8 +10,18 @@ public class EditorSceneBuilder
     {
         var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
         // Camera
-        var camGO = GameObject.FindObjectOfType<Camera>();
-        if(camGO==null) { camGO = new GameObject("Main Camera"); camGO.AddComponent<Camera>(); }
+        Camera existingCam = Object.FindFirstObjectByType<Camera>();
+        GameObject camGO;
+        if (existingCam != null)
+        {
+            camGO = existingCam.gameObject;
+        }
+        else
+        {
+            camGO = new GameObject("Main Camera");
+            camGO.AddComponent<Camera>();
+            camGO.tag = "MainCamera";
+        }
 
         // Canvas
         var canvasGO = new GameObject("EditorUI");
@@ -53,13 +63,14 @@ public class EditorSceneBuilder
         timelineHolder.slider = slider.GetComponent<UnityEngine.UI.Slider>();
         timelineHolder.timeLabel = timeLabel.GetComponent<UnityEngine.UI.Text>();
 
-        // Add a Quad for VideoPlane
-        var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        quad.name = "VideoPlane";
-        quad.transform.position = new Vector3(0,0,5);
-        var vp = quad.AddComponent<UnityEngine.Video.VideoPlayer>();
-        vp.playOnAwake = false;
-        controller.gameObject.AddComponent<UnityEngine.Video.VideoPlayer>();
+    // Add a Quad for VideoPlane
+    var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+    quad.name = "VideoPlane";
+    quad.transform.position = new Vector3(0,0,5);
+    var vp = quad.AddComponent<UnityEngine.Video.VideoPlayer>();
+    vp.playOnAwake = false;
+    // assign VideoPlayer to TimeController
+    controller.SetVideoPlayer(vp);
 
         EditorSceneManager.SaveScene(scene, "Assets/Scenes/Editor.unity");
         EditorUtility.DisplayDialog("Done", "Editor scene generated at Assets/Scenes/Editor.unity", "OK");

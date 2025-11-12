@@ -18,5 +18,11 @@ namespace UnityVFXEditor.Core
             video.time = tSec;
             if(!IsPlaying) video.Pause();
         }
+
+        // Allow runtime assignment from editor helper
+        public void SetVideoPlayer(VideoPlayer vp)
+        {
+            video = vp;
+        }
     }
 }
