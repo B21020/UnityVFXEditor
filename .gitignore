@@ -1,0 +1,38 @@
+# Unity generated files / folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+
+# Auto-generated project files
+*.csproj
+*.unityproj
+*.sln
+*.user
+*.pidb
+*.booproj
+*.svd
+*.suo
+
+# OS files
+.DS_Store
+
+# Visual Studio cache
+.vs/
+
+# Package manager
+Packages/packages-lock.json
+
+# Unity cloud build
+unitycloudbuild-
+
+# Ignore everything in Temp/ (already covered but explicit)
+Temp/
+
+# Keep the Assets and ProjectSettings folders tracked
+!Assets/
+!ProjectSettings/
