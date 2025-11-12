@@ -52,16 +52,30 @@ public class EditorSceneBuilder
         var slider = CreateSlider(bottom.transform, new Vector2(0,20), 400);
         var timeLabel = CreateText(bottom.transform, "00:00", new Vector2(220,20));
 
-        // TimeController on root
-        var tc = new GameObject("TimeController");
-        var controller = tc.AddComponent<UnityVFXEditor.Core.TimeController>();
+    // Marker layer (empty rect under timeline where markers live)
+    var markerLayerGO = new GameObject("MarkerLayer", typeof(RectTransform));
+    markerLayerGO.transform.SetParent(bottom.transform, false);
+    var markerRT = markerLayerGO.GetComponent<RectTransform>();
+    markerRT.anchorMin = new Vector2(0, 0.5f); markerRT.anchorMax = new Vector2(1, 0.5f); markerRT.sizeDelta = new Vector2(0, 40); markerRT.anchoredPosition = new Vector2(0, 10);
 
-        // Wire up TimelineUI
-        var timelineHolder = tc.AddComponent<UnityVFXEditor.UI.TimelineUI>();
-        timelineHolder.playButton = play.GetComponent<UnityEngine.UI.Button>();
-        timelineHolder.pauseButton = pause.GetComponent<UnityEngine.UI.Button>();
-        timelineHolder.slider = slider.GetComponent<UnityEngine.UI.Slider>();
-        timelineHolder.timeLabel = timeLabel.GetComponent<UnityEngine.UI.Text>();
+    // TimeController on root
+    var tc = new GameObject("TimeController");
+    var controller = tc.AddComponent<UnityVFXEditor.Core.TimeController>();
+
+    // Wire up TimelineUI (simple play/pause/slider display)
+    var timelineHolder = tc.AddComponent<UnityVFXEditor.UI.TimelineUI>();
+    timelineHolder.playButton = play.GetComponent<UnityEngine.UI.Button>();
+    timelineHolder.pauseButton = pause.GetComponent<UnityEngine.UI.Button>();
+    timelineHolder.slider = slider.GetComponent<UnityEngine.UI.Slider>();
+    timelineHolder.timeLabel = timeLabel.GetComponent<UnityEngine.UI.Text>();
+
+    // Add TimelineView (marker interactions)
+    var timelineView = tc.AddComponent<UnityVFXEditor.UI.TimelineView>();
+    timelineView.markerLayer = markerRT;
+    timelineView.timeSlider = slider.GetComponent<UnityEngine.UI.Slider>();
+    timelineView.playButton = play.GetComponent<UnityEngine.UI.Button>();
+    timelineView.pauseButton = pause.GetComponent<UnityEngine.UI.Button>();
+    timelineView.timeLabel = timeLabel.GetComponent<UnityEngine.UI.Text>();
 
     // Add a Quad for VideoPlane
     var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -71,6 +85,21 @@ public class EditorSceneBuilder
     vp.playOnAwake = false;
     // assign VideoPlayer to TimeController
     controller.SetVideoPlayer(vp);
+
+        // Create ProjectManager
+        var pmGO = new GameObject("ProjectManager");
+        pmGO.AddComponent<UnityVFXEditor.Core.ProjectManager>();
+
+        // Create PickManager for clicking on preview
+        var pick = new GameObject("PickManager");
+        var pickMgr = pick.AddComponent<UnityVFXEditor.Core.PickManager>();
+        pickMgr.cam = camGO.GetComponent<Camera>();
+        pickMgr.videoPlane = quad;
+
+        // Add a simple ZGauge inside Preview for visual feedback
+        var zg = new GameObject("ZGauge", typeof(RectTransform)); zg.transform.SetParent(top.transform, false);
+        var zgImg = zg.AddComponent<UnityEngine.UI.Image>(); zgImg.color = Color.cyan;
+        var zgRT = zg.GetComponent<RectTransform>(); zgRT.sizeDelta = new Vector2(10, 40); zgRT.anchoredPosition = new Vector2(0, -30);
 
         EditorSceneManager.SaveScene(scene, "Assets/Scenes/Editor.unity");
         EditorUtility.DisplayDialog("Done", "Editor scene generated at Assets/Scenes/Editor.unity", "OK");
@@ -115,7 +144,7 @@ public class EditorSceneBuilder
         go.transform.SetParent(parent, false);
         var t = go.AddComponent<UnityEngine.UI.Text>();
         t.text = text;
-        t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+    t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         t.alignment = TextAnchor.MiddleCenter;
         t.color = Color.white;
         var rt = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>();
@@ -131,7 +160,7 @@ public class EditorSceneBuilder
         var img = go.AddComponent<UnityEngine.UI.Image>(); img.color = Color.white * 0.8f;
         var rt = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>(); rt.sizeDelta = new Vector2(80, 30); rt.anchoredPosition = pos;
         var txtGO = new GameObject("Text", typeof(RectTransform)); txtGO.transform.SetParent(go.transform, false);
-        var txt = txtGO.AddComponent<UnityEngine.UI.Text>(); txt.text = label; txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); txt.alignment = TextAnchor.MiddleCenter; txt.color = Color.black;
+    var txt = txtGO.AddComponent<UnityEngine.UI.Text>(); txt.text = label; txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); txt.alignment = TextAnchor.MiddleCenter; txt.color = Color.black;
         var rt2 = txtGO.GetComponent<RectTransform>() ?? txtGO.AddComponent<RectTransform>(); rt2.anchorMin = Vector2.zero; rt2.anchorMax = Vector2.one; rt2.sizeDelta = Vector2.zero;
         return go;
     }
@@ -154,7 +183,7 @@ public class EditorSceneBuilder
     static GameObject CreateText(Transform parent, string text, Vector2 pos)
     {
         var go = new GameObject("TimeLabel"); go.transform.SetParent(parent, false);
-        var t = go.AddComponent<UnityEngine.UI.Text>(); t.text = text; t.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); t.alignment = TextAnchor.MiddleCenter; t.color = Color.white;
+    var t = go.AddComponent<UnityEngine.UI.Text>(); t.text = text; t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); t.alignment = TextAnchor.MiddleCenter; t.color = Color.white;
         var rt = go.GetComponent<RectTransform>(); rt.sizeDelta = new Vector2(80,30); rt.anchoredPosition = pos;
         return go;
     }
