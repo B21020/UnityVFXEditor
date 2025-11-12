@@ -78,56 +78,74 @@ public class EditorSceneBuilder
 
     static GameObject CreatePanel(Transform parent, string name, Rect offsets, Vector2 anchorMin, Vector2 anchorMax)
     {
-        var go = new GameObject(name);
-        go.transform.SetParent(parent, false);
+        // Create GameObject with RectTransform (UI element)
+        var go = new GameObject(name, typeof(RectTransform));
+
+        // If parent is missing, try to find an existing Canvas in the scene
+        if (parent != null)
+        {
+            go.transform.SetParent(parent, false);
+        }
+        else
+        {
+            var canvas = Object.FindFirstObjectByType<Canvas>();
+            if (canvas != null) go.transform.SetParent(canvas.transform, false);
+        }
+
+        // Ensure Image component for background
         var img = go.AddComponent<UnityEngine.UI.Image>();
-        img.color = new Color(0.15f,0.15f,0.15f,0.9f);
-        var rt = go.AddComponent<RectTransform>();
+        img.color = new Color(0.15f, 0.15f, 0.15f, 0.9f);
+
+        var rt = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>();
         rt.anchorMin = anchorMin;
         rt.anchorMax = anchorMax;
-        rt.pivot = new Vector2(0.5f,0.5f);
-        rt.sizeDelta = new Vector2(offsets.width, offsets.height);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+
+        // Defensive: prevent negative sizeDelta from confusing layout code
+        var width = float.IsNaN(offsets.width) ? 100f : offsets.width;
+        var height = float.IsNaN(offsets.height) ? 100f : offsets.height;
+        rt.sizeDelta = new Vector2(Mathf.Abs(width), Mathf.Abs(height));
         rt.anchoredPosition = new Vector2(offsets.x, offsets.y);
         return go;
     }
 
     static GameObject CreateLabel(Transform parent, string text)
     {
-        var go = new GameObject("Label");
+        var go = new GameObject("Label", typeof(RectTransform));
         go.transform.SetParent(parent, false);
         var t = go.AddComponent<UnityEngine.UI.Text>();
         t.text = text;
         t.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         t.alignment = TextAnchor.MiddleCenter;
         t.color = Color.white;
-        var rt = go.GetComponent<RectTransform>();
+        var rt = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>();
         rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.sizeDelta = Vector2.zero;
         return go;
     }
 
     static GameObject CreateButton(Transform parent, string label, Vector2 pos)
     {
-        var go = new GameObject(label+"Button");
+        var go = new GameObject(label + "Button", typeof(RectTransform));
         go.transform.SetParent(parent, false);
         var btn = go.AddComponent<UnityEngine.UI.Button>();
         var img = go.AddComponent<UnityEngine.UI.Image>(); img.color = Color.white * 0.8f;
-        var rt = go.AddComponent<RectTransform>(); rt.sizeDelta = new Vector2(80,30); rt.anchoredPosition = pos;
-        var txtGO = new GameObject("Text"); txtGO.transform.SetParent(go.transform, false);
+        var rt = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>(); rt.sizeDelta = new Vector2(80, 30); rt.anchoredPosition = pos;
+        var txtGO = new GameObject("Text", typeof(RectTransform)); txtGO.transform.SetParent(go.transform, false);
         var txt = txtGO.AddComponent<UnityEngine.UI.Text>(); txt.text = label; txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); txt.alignment = TextAnchor.MiddleCenter; txt.color = Color.black;
-        var rt2 = txtGO.GetComponent<RectTransform>(); rt2.anchorMin = Vector2.zero; rt2.anchorMax = Vector2.one; rt2.sizeDelta = Vector2.zero;
+        var rt2 = txtGO.GetComponent<RectTransform>() ?? txtGO.AddComponent<RectTransform>(); rt2.anchorMin = Vector2.zero; rt2.anchorMax = Vector2.one; rt2.sizeDelta = Vector2.zero;
         return go;
     }
 
     static GameObject CreateSlider(Transform parent, Vector2 pos, float width)
     {
-        var go = new GameObject("TimelineSlider"); go.transform.SetParent(parent, false);
+        var go = new GameObject("TimelineSlider", typeof(RectTransform)); go.transform.SetParent(parent, false);
         var slider = go.AddComponent<UnityEngine.UI.Slider>();
-        var rt = go.AddComponent<RectTransform>(); rt.sizeDelta = new Vector2(width,20); rt.anchoredPosition = pos;
+        var rt = go.GetComponent<RectTransform>() ?? go.AddComponent<RectTransform>(); rt.sizeDelta = new Vector2(width, 20); rt.anchoredPosition = pos;
         // Note: not fully fleshed (no background/thumb). For visual placeholder, add Image components
-        var bg = new GameObject("Background"); bg.transform.SetParent(go.transform, false); var img = bg.AddComponent<UnityEngine.UI.Image>(); img.color = Color.gray; var rt2 = bg.GetComponent<RectTransform>(); rt2.anchorMin = Vector2.zero; rt2.anchorMax = Vector2.one; rt2.sizeDelta = Vector2.zero;
-        var fill = new GameObject("Fill"); fill.transform.SetParent(bg.transform, false); var imgf = fill.AddComponent<UnityEngine.UI.Image>(); imgf.color = Color.green; var rt3 = fill.GetComponent<RectTransform>(); rt3.anchorMin = Vector2.zero; rt3.anchorMax = new Vector2(0.5f,1); rt3.sizeDelta = Vector2.zero;
-        var thumb = new GameObject("Thumb"); thumb.transform.SetParent(go.transform, false); var imgt = thumb.AddComponent<UnityEngine.UI.Image>(); imgt.color = Color.white; var rt4 = thumb.GetComponent<RectTransform>(); rt4.sizeDelta = new Vector2(12,20);
-        slider.fillRect = imgf.rectTransform;
+        var bg = new GameObject("Background", typeof(RectTransform)); bg.transform.SetParent(go.transform, false); var img = bg.AddComponent<UnityEngine.UI.Image>(); img.color = Color.gray; var rt2 = bg.GetComponent<RectTransform>(); rt2.anchorMin = Vector2.zero; rt2.anchorMax = Vector2.one; rt2.sizeDelta = Vector2.zero;
+        var fill = new GameObject("Fill", typeof(RectTransform)); fill.transform.SetParent(bg.transform, false); var imgf = fill.AddComponent<UnityEngine.UI.Image>(); imgf.color = Color.green; var rt3 = fill.GetComponent<RectTransform>(); rt3.anchorMin = Vector2.zero; rt3.anchorMax = new Vector2(0.5f, 1); rt3.sizeDelta = Vector2.zero;
+        var thumb = new GameObject("Thumb", typeof(RectTransform)); thumb.transform.SetParent(go.transform, false); var imgt = thumb.AddComponent<UnityEngine.UI.Image>(); imgt.color = Color.white; var rt4 = thumb.GetComponent<RectTransform>(); rt4.sizeDelta = new Vector2(12, 20);
+        slider.fillRect = imgf.GetComponent<RectTransform>();
         slider.targetGraphic = imgt;
         slider.handleRect = rt4;
         return go;
