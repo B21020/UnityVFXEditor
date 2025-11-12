@@ -1,4 +1,4 @@
-# Unity generated files / folders
+# --- Unity core cache ---
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -7,32 +7,36 @@
 [Ll]ogs/
 UserSettings/
 MemoryCaptures/
+CrashReports/
 
-# Auto-generated project files
+# --- IDEs / OS cruft ---
+.vs/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Unity auto-generated project files (we regenerate them) ---
 *.csproj
-*.unityproj
 *.sln
+*.suo
 *.user
+*.unityproj
 *.pidb
 *.booproj
 *.svd
-*.suo
+*.pdb
 
-# OS files
-.DS_Store
+# --- Backups / intermediates ---
+*.tmp
+*.bak
 
-# Visual Studio cache
-.vs/
+# --- Rider/VS Code workspace junk (keep .vscode folder itself for shared settings) ---
+*.code-workspace
 
-# Package manager
-Packages/packages-lock.json
+# --- Addressables / builds you don’t want in Git (optional, uncomment if needed) ---
+# Assets/AddressableAssetsData/*
+# Build/*
+# Builds/*
 
-# Unity cloud build
-unitycloudbuild-
-
-# Ignore everything in Temp/ (already covered but explicit)
-Temp/
-
-# Keep the Assets and ProjectSettings folders tracked
-!Assets/
-!ProjectSettings/
+# --- Package lock can be committed; ignore if you prefer fresh resolve each clone ---
+# Packages/packages-lock.json
