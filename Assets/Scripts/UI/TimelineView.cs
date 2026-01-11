@@ -26,16 +26,21 @@ namespace UnityVFXEditor.UI
             if (playButton) playButton.onClick.AddListener(()=> timeController?.Play());
             if (pauseButton) pauseButton.onClick.AddListener(()=> timeController?.Pause());
             if (timeSlider) timeSlider.onValueChanged.AddListener(OnSlider);
-            ProjectManager.Instance?.OnScheduleChanged += RebuildMarkers;
-            ProjectManager.Instance?.OnSelectionChanged += OnSelectionChanged;
+            var pm = ProjectManager.Instance;
+            if (pm != null)
+            {
+                pm.OnScheduleChanged += RebuildMarkers;
+                pm.OnSelectionChanged += OnSelectionChanged;
+            }
         }
 
         void OnDestroy()
         {
-            if (ProjectManager.Instance!=null)
+            var pm = ProjectManager.Instance;
+            if (pm!=null)
             {
-                ProjectManager.Instance.OnScheduleChanged -= RebuildMarkers;
-                ProjectManager.Instance.OnSelectionChanged -= OnSelectionChanged;
+                pm.OnScheduleChanged -= RebuildMarkers;
+                pm.OnSelectionChanged -= OnSelectionChanged;
             }
         }
 

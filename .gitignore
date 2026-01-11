@@ -30,6 +30,11 @@ Thumbs.db
 *.tmp
 *.bak
 
+# --- Local backup/history folders (repo-share should exclude) ---
+Assets_git_backup/
+.history/
+**/.history/
+
 # --- Rider/VS Code workspace junk (keep .vscode folder itself for shared settings) ---
 *.code-workspace
 

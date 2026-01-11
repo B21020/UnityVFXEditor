@@ -13,6 +13,7 @@ namespace UnityVFXEditor.UI
         public Text    timeLabel;
 
         TimeController tc;
+        bool _suppress;
 
         void Awake()
         {
@@ -22,27 +23,48 @@ namespace UnityVFXEditor.UI
             if(slider!=null) slider.onValueChanged.AddListener(OnSlider);
         }
 
-        void Update()
+        void OnDestroy()
         {
-            if(tc==null) return;
-            if(tc.Duration>0)
-            {
-                if(!slider.IsActive() || !slider.interactable) { slider.value = (float)(tc.CurrentTime / tc.Duration); }
-                if(timeLabel) timeLabel.text = FormatTime(tc.CurrentTime);
-            }
+            if (slider != null)
+                slider.onValueChanged.RemoveListener(OnSlider);
         }
 
-        void OnSlider(float v)
+        void Update()
         {
-            if(tc==null) return;
-            var t = v * (float)tc.Duration;
-            tc.Seek(t);
+            if (tc == null || slider == null) return;
+
+            var dur = tc.Duration;
+            if (dur <= 0.0) return;
+
+            // 現在時刻に応じてスライダーを更新（再生中/停止中どちらも）
+            _suppress = true;
+            slider.value = (float)(tc.CurrentTime / dur);
+            _suppress = false;
+
+            // ラベル: 現在 / 総時間
+            if (timeLabel != null)
+                timeLabel.text = string.Format("{0} / {1}", FormatTime(tc.CurrentTime), FormatTime(dur));
+        }
+
+        void OnSlider(float value01)
+        {
+            if (_suppress) return;
+            if (tc == null) return;
+
+            var dur = tc.Duration;
+            if (dur <= 0.0) return;
+
+            // 0..1 を秒へ変換してシーク
+            tc.Seek((float)(value01 * dur));
         }
 
         string FormatTime(double s)
         {
-            var ts = System.TimeSpan.FromSeconds(s);
-            return string.Format("{0:D2}:{1:D2}", ts.Minutes, ts.Seconds);
+            if (s < 0) s = 0;
+            int totalSeconds = (int)s;
+            int m = totalSeconds / 60;
+            int sec = totalSeconds % 60;
+            return string.Format("{0:00}:{1:00}", m, sec);
         }
     }
 }

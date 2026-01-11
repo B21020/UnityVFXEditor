@@ -1,6 +1,5 @@
 # Normalize line endings (prefer LF cross-platform)
 * text=auto eol=lf
-
 # Use Unity Smart Merge (UnityYAMLMerge) for YAML-based assets
 # You must configure the merge driver once per repo (see README).
 *.unity      merge=unityyamlmerge
@@ -13,7 +12,6 @@
 *.asset      merge=unityyamlmerge
 ProjectSettings/*.asset merge=unityyamlmerge
 Packages/*.json merge=unityyamlmerge
-
 # Treat common binary asset types as binary
 *.png  -text
 *.jpg  -text
@@ -32,7 +30,7 @@ Packages/*.json merge=unityyamlmerge
 *.fbx  -text
 *.obj  -text
 *.blend -text
-*.mp4  -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
 *.mov  -text
 *.avi  -text
 *.zip  -text
